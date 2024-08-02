@@ -35,8 +35,6 @@ export class CreateAccountController {
       },
     })
 
-    console.log('usersWithSameEmail', usersWithSameEmail)
-
     if (usersWithSameEmail) {
       throw new ConflictException('Email already in use')
     }
