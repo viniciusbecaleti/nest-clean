@@ -5,9 +5,17 @@ POST {{apiurl}}/accounts
 Content-Type: application/json
 
 {
-  "name": "Rosana",
-  "email": "rosana@email.com",
+  "name": "Vinicius",
+  "email": "vinicius@email.com",
   "password": "123456"
 }
 
 ###
+
+POST {{apiurl}}/sessions
+Content-Type: application/json
+
+{
+  "email": "vinicius@email.com",
+  "password": "123456" 
+}
