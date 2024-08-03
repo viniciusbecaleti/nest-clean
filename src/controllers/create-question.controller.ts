@@ -1,29 +1,60 @@
-import { Controller, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, UseGuards, UsePipes } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { CurrentUser } from 'src/auth/current-user.decorator'
 import { TokenPayloadSchema } from 'src/auth/jwt.strategy'
-// import { PrismaService } from 'src/prisma/prisma.service'
-// import { z } from 'zod'
+import { ZodValidationPipe } from 'src/pipes/zod-validation-pipe'
+import { PrismaService } from 'src/prisma/prisma.service'
+import { z } from 'zod'
 
-// const createQuestionBodySchema = z.object({
-//   title: z.string(),
-//   content: z.string(),
-//   authorId: z.string(),
-// })
+const createQuestionBodySchema = z.object({
+  title: z.string(),
+  content: z.string(),
+})
 
-// type CreateQuestionBodySchema = z.infer<typeof createQuestionBodySchema>
+type CreateQuestionBodySchema = z.infer<typeof createQuestionBodySchema>
 
 @Controller('/questions')
 @UseGuards(AuthGuard('jwt'))
 export class CreateQuestionController {
-  // constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   @Post()
-  async handle(@CurrentUser() user: TokenPayloadSchema) {
+  @UsePipes(new ZodValidationPipe(createQuestionBodySchema))
+  async handle(
+    @Body() body: CreateQuestionBodySchema,
+    @CurrentUser() user: TokenPayloadSchema,
+  ) {
+    const { title, content } = body
     const { sub: userId } = user
 
-    console.log(userId)
+    const slug = this.convertToSlug(title)
 
-    return 'OK'
+    const questionWithSameSlug = await this.prisma.question.findUnique({
+      where: { slug },
+    })
+
+    let newSlug = slug
+
+    if (questionWithSameSlug) {
+      newSlug = `${slug}-${Date.now()}`
+    }
+
+    await this.prisma.question.create({
+      data: {
+        title,
+        content,
+        slug: newSlug,
+        authorId: userId,
+      },
+    })
+  }
+
+  convertToSlug(slug: string) {
+    return slug
+      .toLowerCase()
+      .normalize('NFC')
+      .replace(/[\u0300-\u036f]/g, '-')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
   }
 }

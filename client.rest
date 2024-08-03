@@ -31,5 +31,7 @@ Authorization: Bearer {{ token }}
 
 {
   "title": "Qual a cor do céu?",
-  "description": "Gostaria de saber a cor do céu"
+  "content": "Gostaria de saber a cor do céu"
 }
+
+### 
