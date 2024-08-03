@@ -1,6 +1,8 @@
 ### Variables 
 @apiurl = http://localhost:3333
+@token = {{ authenticate.response.body.access_token }}
 
+# @name create_account
 POST {{apiurl}}/accounts
 Content-Type: application/json
 
@@ -12,10 +14,22 @@ Content-Type: application/json
 
 ###
 
+# @name authenticate
 POST {{apiurl}}/sessions
 Content-Type: application/json
 
 {
   "email": "vinicius@email.com",
   "password": "123456" 
+}
+
+###
+
+POST {{apiurl}}/questions
+Content-Type: application/json
+Authorization: Bearer {{ token }}
+
+{
+  "title": "Qual a cor do céu?",
+  "description": "Gostaria de saber a cor do céu"
 }
