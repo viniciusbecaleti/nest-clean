@@ -25,6 +25,7 @@ Content-Type: application/json
 
 ###
 
+# @name create_question
 POST {{apiurl}}/questions
 Content-Type: application/json
 Authorization: Bearer {{ token }}
@@ -35,3 +36,8 @@ Authorization: Bearer {{ token }}
 }
 
 ### 
+
+# @name fetch_recent_questions
+GET {{apiurl}}/questions?page=4
+Content-Type: application/json
+Authorization: Bearer {{ token }}
